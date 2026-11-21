@@ -1,7 +1,7 @@
 // candidate.c - Student 3 - Candidate Management
 #include "common.h"
 
-int findCandidateByID(int id) {
+int findCandidateByID(int id) {// function declaration
     Candidate *ptr = candidates;
     for (int i = 0; i < candidateCount; i++) {
         if ((ptr + i)->candidateID == id) return i;
