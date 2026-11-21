@@ -2,7 +2,7 @@
 #include "common.h"
 
 int findVoterByID(int id) {
-    Voter *ptr = voters; // Pointer usage for rubric
+    Voter *ptr = voters;
     for (int i = 0; i < voterCount; i++) {
         if ((ptr + i)->voterID == id) return i;
     }
@@ -16,26 +16,43 @@ int findVoterByCNIC(char *cnic) {
 }
 
 void addVoter() {
-    if (voterCount >= MAX_VOTERS) { printf("Voter list full!\n"); return; }
+    if (voterCount >= MAX_VOTERS) { printf(RED "Voter list full!\n" RESET); return; }
     Voter v;
-    printf("\n--- Add New Voter ---\n");
-    printf("Enter Voter ID: "); scanf("%d", &v.voterID); clearBuffer();
-    if (v.voterID <= 0) { printf("Invalid ID!\n"); return; }
-    if (findVoterByID(v.voterID) != -1) { printf("ID already exists!\n"); return; }
-    printf("Enter Full Name: "); fgets(v.name, sizeof(v.name), stdin);
+    printf(YELLOW "\n--- Add New Voter ---\n" RESET);
+    printf("Enter Voter ID: ");
+    if(scanf("%d", &v.voterID) != 1){ printf(RED "Invalid ID input!\n" RESET); clearBuffer(); return; }
+    clearBuffer();
+    if (v.voterID <= 0) { printf(RED "Invalid ID! Must be > 0\n" RESET); return; }
+    if (findVoterByID(v.voterID) != -1) { printf(RED "ID already exists! Try ID %d\n" RESET, v.voterID + 1); return; }
+
+    printf("Enter Full Name: ");
+    fgets(v.name, sizeof(v.name), stdin);
     v.name[strcspn(v.name, "\n")] = 0;
-    printf("Enter CNIC (13 digits, no dashes): "); fgets(v.cnic, sizeof(v.cnic), stdin);
+    if(strlen(v.name) == 0){ printf(RED "Name cannot be empty! Try again.\n" RESET); return; }
+
+    printf("Enter CNIC (13 digits, no dashes): ");
+    fgets(v.cnic, sizeof(v.cnic), stdin);
     v.cnic[strcspn(v.cnic, "\n")] = 0;
-    if (strlen(v.cnic) != 13) { printf("Invalid CNIC! Must be 13 digits.\n"); return; }
-    if (findVoterByCNIC(v.cnic) != -1) { printf("CNIC already registered!\n"); return; }
-    printf("Enter Age: "); scanf("%d", &v.age); clearBuffer();
-    if (v.age < 18) { printf("Not eligible! Must be 18+.\n"); return; }
-    printf("Enter Constituency (e.g. NA-247): "); fgets(v.constituency, sizeof(v.constituency), stdin);
+    printf("You entered CNIC: '%s' Length = %d\n", v.cnic, (int)strlen(v.cnic));
+    if (strlen(v.cnic) != 13) { printf(RED "Invalid CNIC! Must be exactly 13 digits.\n" RESET); return; }
+    if (findVoterByCNIC(v.cnic) != -1) { printf(RED "CNIC already registered! Use different CNIC.\n" RESET); return; }
+
+    printf("Enter Age: ");
+    if(scanf("%d", &v.age) != 1){ printf(RED "Invalid Age!\n" RESET); clearBuffer(); return; }
+    clearBuffer();
+    if (v.age < 18) { printf(RED "Not eligible! Must be 18+.\n" RESET); return; }
+
+    printf("Enter Constituency (e.g. NA-247): ");
+    fgets(v.constituency, sizeof(v.constituency), stdin);
     v.constituency[strcspn(v.constituency, "\n")] = 0;
+
     v.hasVoted = 0; v.votedFor = 0;
     voters[voterCount++] = v;
     saveData();
-    printf("Voter Registered Successfully!\n");
+    printf(GREEN "Voter Registered Successfully! Total voters now = %d\n" RESET, voterCount);
+    printf("\n--------------------------------\n");
+    printf("Press Enter to return to menu");
+    getchar();
 }
 
 void displayVoters() {
@@ -45,40 +62,113 @@ void displayVoters() {
     for (int i = 0; i < voterCount; i++) {
         printf("%-8d %-25s %-15s %-5d %-12s %-10s\n", voters[i].voterID, voters[i].name, voters[i].cnic, voters[i].age, voters[i].constituency, voters[i].hasVoted ? "Voted" : "Not Voted");
     }
+    printf("\n-------------------------------------------------------------------------\n");
+    printf("Press Enter to return to menu");
+    getchar();
 }
 
 void searchVoter() {
-    int opt; printf("Search by: 1. ID  2. CNIC\nEnter: "); scanf("%d", &opt); clearBuffer();
+    int opt;
+    printf("Search by: 1. ID  2. CNIC\nEnter: ");
+    scanf("%d", &opt);
+    clearBuffer();
+
     if (opt == 1) {
-        int id; printf("Enter Voter ID: "); scanf("%d", &id);
+        int id;
+        printf("Enter Voter ID: ");
+        scanf("%d", &id);
+        clearBuffer();
         int idx = findVoterByID(id);
-        if (idx == -1) printf("Not found!\n");
-        else printf("Found: %s | CNIC %s | %s | %s\n", voters[idx].name, voters[idx].cnic, voters[idx].constituency, voters[idx].hasVoted ? "Voted" : "Not Voted");
-    } else if (opt == 2) {
-        char cnic[20]; printf("Enter CNIC: "); fgets(cnic, sizeof(cnic), stdin); cnic[strcspn(cnic, "\n")] = 0;
-        int idx = findVoterByCNIC(cnic);
-        if (idx == -1) printf("Not found!\n");
-        else printf("Found: ID %d - %s | %s\n", voters[idx].voterID, voters[idx].name, voters[idx].constituency);
+        if (idx == -1) {
+            printf(RED "Not found!\n" RESET);
+        } else {
+            printf(GREEN "Found: %s | CNIC %s | %s | %s\n" RESET,
+                   voters[idx].name,
+                   voters[idx].cnic,
+                   voters[idx].constituency,
+                   voters[idx].hasVoted ? "Voted" : "Not Voted");
+        }
     }
+    else if (opt == 2) {
+        char cnic[20];
+        printf("Enter CNIC: ");
+        fgets(cnic, sizeof(cnic), stdin);
+        cnic[strcspn(cnic, "\n")] = 0;
+        int idx = findVoterByCNIC(cnic);
+        if (idx == -1) {
+            printf(RED "Not found!\n" RESET);
+        } else {
+            printf(GREEN "Found: ID %d - %s | %s\n" RESET,
+                   voters[idx].voterID,
+                   voters[idx].name,
+                   voters[idx].constituency);
+        }
+    }
+    else {
+        printf(RED "Invalid option!\n" RESET);
+    }
+    printf("\nPress Enter to return to menu");
+    getchar();
 }
 
+
 void updateVoter() {
-    int id; printf("Enter Voter ID to update: "); scanf("%d", &id); clearBuffer();
+    int id;
+    printf("Enter Voter ID to update: ");
+    scanf("%d", &id);
+    clearBuffer();
+
     int idx = findVoterByID(id);
-    if (idx == -1) { printf("Not found!\n"); return; }
-    printf("Current Name: %s\nEnter New Name: ", voters[idx].name);
+    if (idx == -1) {
+        printf("%sNot found!\n%s", RED, RESET);
+        printf("\n--------------------------------\n");
+        printf("Press Enter to return to menu");
+        getchar();
+        return;
+    }
+
+    printf("Current Name: %s | Constituency: %s\n",
+           voters[idx].name, voters[idx].constituency);
+
+    printf("Enter New Name: ");
     fgets(voters[idx].name, sizeof(voters[idx].name), stdin);
     voters[idx].name[strcspn(voters[idx].name, "\n")] = 0;
+
     printf("Enter New Constituency: ");
     fgets(voters[idx].constituency, sizeof(voters[idx].constituency), stdin);
     voters[idx].constituency[strcspn(voters[idx].constituency, "\n")] = 0;
-    saveData(); printf("Voter updated!\n");
+
+    saveData();
+    printf("%sVoter Updated! Name updated to: %s\n%s", GREEN, voters[idx].name, RESET);
+
+    printf("\n--------------------------------\n");
+    printf("Press Enter to return to menu");
+    getchar();
 }
 
 void deleteVoter() {
-    int id; printf("Enter Voter ID to delete: "); scanf("%d", &id);
+    int id;
+    printf("Enter Voter ID to delete: ");
+    scanf("%d", &id);
+    clearBuffer();
+
     int idx = findVoterByID(id);
-    if (idx == -1) { printf("Not found!\n"); return; }
-    for (int i = idx; i < voterCount - 1; i++) voters[i] = voters[i + 1];
-    voterCount--; saveData(); printf("Voter deleted!\n");
+    if (idx == -1) {
+        printf("%sNot found!\n%s", RED, RESET);
+        printf("\n--------------------------------\n");
+        printf("Press Enter to return to menu");
+        getchar();
+        return;
+    }
+
+    for (int i = idx; i < voterCount - 1; i++) {
+        voters[i] = voters[i + 1];
+    }
+    voterCount--;
+    saveData();
+    printf("%sVoter deleted!\n%s", GREEN, RESET);
+
+    printf("\n--------------------------------\n");
+    printf("Press Enter to return to menu");
+    getchar();
 }
