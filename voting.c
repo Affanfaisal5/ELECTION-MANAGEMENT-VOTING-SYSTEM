@@ -3,13 +3,14 @@
 
 void castVote() {
     int voterID, candID;
-    printf("\n--- Cast Vote ---\n");
+    printf(YELLOW "\n--- Cast Vote ---\n" RESET);
     printf("Enter Your Voter ID: "); scanf("%d", &voterID);
+    clearBuffer();
     int vIdx = findVoterByID(voterID);
-    if (vIdx == -1) { printf("You are not registered!\n"); return; }
-    if (voters[vIdx].hasVoted) { printf("ERROR: You already voted! Double voting not allowed.\n"); return; }
+    if (vIdx == -1) { printf(RED "You are not registered!\n" RESET); return; }
+    if (voters[vIdx].hasVoted) { printf(RED "ERROR: You already voted! Double voting not allowed.\n" RESET); return; }
 
-    printf("Voter: %s | Constituency: %s\n", voters[vIdx].name, voters[vIdx].constituency);
+    printf(CYAN "Voter: %s | Constituency: %s\n" RESET, voters[vIdx].name, voters[vIdx].constituency);
     printf("\nCandidates in your constituency:\n");
     int any = 0;
     for (int i = 0; i < candidateCount; i++) {
@@ -21,15 +22,53 @@ void castVote() {
     if (!any) { printf("No candidates in your constituency yet.\n"); return; }
 
     printf("Enter Candidate ID to vote for: "); scanf("%d", &candID);
-    int cIdx = findCandidateByID(candID); // FIX: Never use candidates[id-1]
-    if (cIdx == -1) { printf("Invalid Candidate ID!\n"); return; }
+    clearBuffer();
+    int cIdx = findCandidateByID(candID);
+    if (cIdx == -1) { printf(RED "Invalid Candidate ID!\n" RESET); return; }
     if (strcmp(candidates[cIdx].constituency, voters[vIdx].constituency) != 0) {
-        printf("Cannot vote! Candidate is from different constituency.\n");
+        printf(RED "Cannot vote! Candidate is from different constituency.\n" RESET);
         return;
     }
     candidates[cIdx].votes++;
     voters[vIdx].hasVoted = 1;
     voters[vIdx].votedFor = candID;
     saveData();
-    printf("Vote Cast Successfully for %s! Thank you.\n", candidates[cIdx].name);
+    printf(GREEN "Vote Cast Successfully for %s! Thank you.\n" RESET, candidates[cIdx].name);
+    printf("Press Enter to return to menu");
+    getchar();
+}
+
+void showResults() {
+    if (candidateCount == 0) {
+        printf("%sNo candidates.\n%s", RED, RESET);
+        printf("\n--------------------------------\n");
+        printf("Press Enter to return to menu");
+        getchar();
+        return;
+    }
+
+    printf("%s\n========== ELECTION RESULTS ==========\n%s", YELLOW, RESET);
+    printf("ID | Name | Party | Constituency | Symbol | Votes\n");
+    printf("-----------------------------------------------\n");
+
+    int totalVotes = 0;
+    for (int i = 0; i < candidateCount; i++) {
+        printf("%d | %s | %s | %s | %s | %d\n",
+               candidates[i].candidateID, candidates[i].name,
+               candidates[i].party, candidates[i].constituency,
+               candidates[i].symbol, candidates[i].votes);
+        totalVotes += candidates[i].votes;
+    }
+
+    printf("-----------------------------------------------\n");
+    printf("Total Votes Cast: %d\n", totalVotes);
+    printf("Total Voters: %d\n", voterCount);
+
+    printf("\n--------------------------------\n");
+    printf("Press Enter to return to menu");
+    getchar();
+
+
+    printf(CYAN "Total Votes Cast: %d / Total Voters: %d\n" RESET,           totalVotes, voterCount);
+
 }
