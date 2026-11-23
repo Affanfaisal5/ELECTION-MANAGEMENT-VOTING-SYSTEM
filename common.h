@@ -37,7 +37,7 @@ typedef struct {
 } Candidate;
 
 // Globals - defined in main.c//extern means allocate a memory for a variable or implement a function body
-extern Voter voters[MAX_VOTERS];//extern means to decalre variable 
+extern Voter voters[MAX_VOTERS];// // extern = variable is created in main.c, all files share same one
 extern int voterCount;
 extern Candidate candidates[MAX_CANDIDATES];
 extern int candidateCount;
