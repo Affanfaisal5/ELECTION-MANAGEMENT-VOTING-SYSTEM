@@ -6,7 +6,7 @@ void castVote() {
     printf(YELLOW "\n--- Cast Vote ---\n" RESET);
     printf("Enter Your Voter ID: "); scanf("%d", &voterID);
     clearBuffer();
-    int vIdx = findVoterByID(voterID);
+    int vIdx = findVoterByID(voterID);//call function if not registered give -1
     if (vIdx == -1) { printf(RED "You are not registered!\n" RESET); return; }
     if (voters[vIdx].hasVoted) { printf(RED "ERROR: You already voted! Double voting not allowed.\n" RESET); return; }
 
@@ -14,22 +14,23 @@ void castVote() {
     printf("\nCandidates in your constituency:\n");
     int any = 0;
     for (int i = 0; i < candidateCount; i++) {
-        if (strcmp(candidates[i].constituency, voters[vIdx].constituency) == 0) {
+        if (strcmp(candidates[i].constituency, voters[vIdx].constituency) == 0) {//compare both string if equal give 0
             printf("ID %d - %s (%s) Symbol: %s | Votes: %d\n", candidates[i].candidateID, candidates[i].name, candidates[i].party, candidates[i].symbol, candidates[i].votes);
             any = 1;
         }
     }
-    if (!any) { printf("No candidates in your constituency yet.\n"); return; }
+    if (any==0) { printf("No candidates in your constituency yet.\n"); return; }
 
     printf("Enter Candidate ID to vote for: "); scanf("%d", &candID);
     clearBuffer();
     int cIdx = findCandidateByID(candID);
+    //check for candidate id 
     if (cIdx == -1) { printf(RED "Invalid Candidate ID!\n" RESET); return; }
-    if (strcmp(candidates[cIdx].constituency, voters[vIdx].constituency) != 0) {
+    if (strcmp(candidates[cIdx].constituency, voters[vIdx].constituency) != 0) {//check for constituency if equal give zero else says different constituency 
         printf(RED "Cannot vote! Candidate is from different constituency.\n" RESET);
         return;
     }
-    candidates[cIdx].votes++;
+    candidates[cIdx].votes++;//increment voter eg hamza has 6 vote now has 7
     voters[vIdx].hasVoted = 1;
     voters[vIdx].votedFor = candID;
     saveData();
@@ -69,6 +70,6 @@ void showResults() {
     getchar();
 
 
-    printf(CYAN "Total Votes Cast: %d / Total Voters: %d\n" RESET,           totalVotes, voterCount);
+    printf(CYAN "Total Votes Cast: %d / Total Voters: %d\n" RESET, totalVotes, voterCount);
 
 }
