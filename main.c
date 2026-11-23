@@ -8,12 +8,12 @@ int candidateCount = 0;
 
 void clearBuffer() {
     int c;
-    while ((c = getchar()) != '\n' && c != EOF);
+    while ((c = getchar()) != '\n' && c != EOF);//In simple words: clearBuffer() removes unwanted leftover input so that your next scanf() or fgets() works correctly
 }
 
 void loadData() {
     FILE *fp = fopen(VOTER_FILE, "rb");
-    if (fp != NULL) {
+    if (fp != NULL) {//We use NULL in C to represent a pointer that is not pointing to any valid memory location or object. 
         fread(&voterCount, sizeof(int), 1, fp);
         fread(voters, sizeof(Voter), voterCount, fp);
         fclose(fp);
@@ -43,10 +43,11 @@ void saveData() {
 }
 
 void sortCandidatesByVotes() {
+    //bubble sorting loop sort value by comparing it descending to ascending
     for (int i = 0; i < candidateCount - 1; i++) {
         for (int j = 0; j < candidateCount - i - 1; j++) {
             if (candidates[j].votes < candidates[j + 1].votes) {
-                Candidate temp = candidates[j];
+                Candidate temp = candidates[j];//candidate  declaration
                 candidates[j] = candidates[j + 1];
                 candidates[j + 1] = temp;
             }
@@ -64,7 +65,7 @@ void showWinner() {
         for (int j = 0; j < constCount; j++) {
             if (strcmp(constituencies[j], candidates[i].constituency) == 0) { found = 1; break; }
         }
-        if (!found) {
+        if (found==0) {
             strcpy(constituencies[constCount], candidates[i].constituency);
             constCount++;
         }
@@ -72,7 +73,7 @@ void showWinner() {
     char parties[100][50];
     int partyWins[100] = {0};
     int partyCount = 0;
-    for (int c = 0; c < constCount; c++) {
+    for (int c = 0; c < constCount; c++) {//candidate with the highest number of votes in each constituency
         int bestIdx = -1;
         int bestVotes = -1;
         for (int i = 0; i < candidateCount; i++) {
@@ -88,7 +89,7 @@ void showWinner() {
             for (int p = 0; p < partyCount; p++) {
                 if (strcmp(parties[p], candidates[bestIdx].party) == 0) { partyWins[p]++; pFound = 1; break; }
             }
-            if (!pFound) {
+            if (pFound==0) {
                 strcpy(parties[partyCount], candidates[bestIdx].party);
                 partyWins[partyCount] = 1;
                 partyCount++;
