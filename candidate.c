@@ -86,7 +86,7 @@ void searchCandidate() {
         int idx = findCandidateByID(id);
         if (idx == -1) printf("%sNot found!\n%s", RED, RESET);
         else printf("%sFound: %s | %s | %s | Symbol: %s | Votes: %d\n%s", GREEN, candidates[idx].name, candidates[idx].party, candidates[idx].constituency, candidates[idx].symbol, candidates[idx].votes, RESET);
-    } else {
+    } if(opt ==2){
         char party[50]; printf("Enter Party: "); fgets(party, sizeof(party), stdin); party[strcspn(party, "\n")] = 0;
         int found = 0;
         for (int i = 0; i < candidateCount; i++) {
@@ -95,7 +95,9 @@ void searchCandidate() {
                 found = 1;
             }
         }
-        if (found==0) printf("%sNo candidate of that party.\n%s", RED, RESET);
+    }
+        else{
+             printf("%sNo candidate of that party.\n%s", RED, RESET);
     }
     printf("\n--------------------------------\n");
     printf("Press Enter to return to menu");
