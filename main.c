@@ -43,11 +43,11 @@ void saveData() {
 }
 
 void sortCandidatesByVotes() {
-    //bubble sorting loop sort value by comparing it descending to ascending
+    //Bubble Sort-sorts candidate by votes in descending order(highest votes first)
     for (int i = 0; i < candidateCount - 1; i++) {
         for (int j = 0; j < candidateCount - i - 1; j++) {
             if (candidates[j].votes < candidates[j + 1].votes) {
-                Candidate temp = candidates[j];//candidate  declaration
+                Candidate temp = candidates[j];//candidate  declaration//tenp holds one candidate temporarily to swap
                 candidates[j] = candidates[j + 1];
                 candidates[j + 1] = temp;
             }
@@ -110,13 +110,14 @@ void showWinner() {
     printf("Press Enter to return to menu");
     getchar();
 }
-
+//main()-show menu in infinite loop, calls function based on your choice
 int main() {
     int choice;
+    //loadData()-loads voters and candidates from .dat files when program starts
     loadData();
     while (1) {
         printf("%s\n================================================\n", YELLOW);
-        printf("   ELECTION VOTING MANAGEMENT SYSTEM - CS-112\n");
+        printf("   ELECTION VOTING MANAGEMENT SYSTEM - CS-115\n");
         printf("================================================\n%s", RESET);
         printf("1. Add New Voter (S2)\n2. Display All Voters (S2)\n3. Search Voter (S2)\n4. Update Voter (S2)\n5. Delete Voter (S2)\n");
         printf("6. Add New Candidate (S3)\n7. Display All Candidates (S3)\n8. Search Candidate (S3)\n9. Update Candidate (S3)\n10. Delete Candidate (S3)\n");
@@ -137,7 +138,9 @@ int main() {
             case 10: deleteCandidate(); break;
             case 11: castVote(); break;
             case 12: showResults(); break;
+            //ahowWinner()-Option 13: finds winner of eacg constituency +party with most wins=forms government
             case 13: showWinner(); break;
+            //saveData()-saves votes and candidates so data is not lost
             case 14: saveData(); printf("%sData saved. Bye!\n%s", GREEN, RESET); return 0;
             default: printf("%sInvalid choice!\n%s", RED, RESET);
         }
